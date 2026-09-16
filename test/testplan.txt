@@ -1,0 +1,24 @@
+
+Test Plan:
+
+
+
+////////////////////////////////////////
+
+MAIN TASK:
+
+////////////////////////////////////////
+
+
+1) Move loops into a function
+	1.1) pass variables as parameter
+	1.2) Header file:
+		1.2.1) function Definition 
+	1.3) new test function C file:
+		1.3.1) function declaration (actual body)
+		1.3.2) write test in (only test)
+2) converted dependencies input and output: (hardcode)
+	2.1) ex: yw43_arch_gpio_put()
+	2.2) ex: hard_assert()
+
+3) New test files: (that calls written test function)
