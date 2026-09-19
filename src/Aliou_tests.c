@@ -119,7 +119,7 @@ bool check_GPIO () {
     LED_tast_start = false;
     main_task_start = false;
 
-    return false;
+    return true;
 }
 
 // -----------------------------------------------------------------------------------------------

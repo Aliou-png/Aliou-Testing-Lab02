@@ -23,4 +23,9 @@ bool toggle (bool on, int count, bool PICO_OK);
  */
 char main_test (char c);
 
+// -------- (TEST) TASK COUNT ----------
+bool get_task_count ();
+// -------- (TEST) GPIO SET----------
+bool check_GPIO ();
+
 #endif
