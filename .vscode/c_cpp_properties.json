@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Pico W Local",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/lib/pico-sdk/src/**",
+                "${workspaceFolder}/lib/pico-sdk/src/common/**",
+                "${workspaceFolder}/lib/pico-sdk/src/rp2_common/**",
+                "${workspaceFolder}/lib/pico-sdk/src/boards/include"
+            ],
+            "defines": [
+                "PICO_BOARD=pico_w",
+                "CYW43_LWIP=1"
+            ],
+            "compilerPath": "/opt/homebrew/bin/arm-none-eabi-gcc",
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "macos-clang-arm64"
+        }
+    ],
+    "version": 4
+}
