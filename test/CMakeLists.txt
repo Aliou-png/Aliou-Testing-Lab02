@@ -1,10 +1,18 @@
-add_executable(mytest test.c unity_config.c)
+# add_executable(mytest test.c unity_config.c)
+add_executable(mytest
+  Aliou_test.c
+  ../src/Aliou_tests.c # back out of the directory
+  unity_config.c)
 
 target_link_libraries(mytest PRIVATE
   pico_stdlib
   pico_async_context_freertos
   FreeRTOS-Kernel-Heap4
   unity
+)
+
+target_include_directories(mytest PRIVATE
+  ../include
 )
 
 # The CYW43 is the Wifi/Bluetooth module. If the board is set to pico_w, this
@@ -36,10 +44,15 @@ set(RENODE_FLAGS
   --console
   )
 
+# add_test(NAME simulate_mytest COMMAND
+#     ${RENODE}
+#      ${RENODE_FLAGS}
+#     -e "$ELF=@$<TARGET_FILE:mytest>; $WORKING=@${CMAKE_SOURCE_DIR}; include @${CMAKE_SOURCE_DIR}/test/simulate.resc; start"
+#     )
 add_test(NAME simulate_mytest COMMAND
     ${RENODE}
      ${RENODE_FLAGS}
-    -e "$ELF=@$<TARGET_FILE:mytest>; $WORKING=@${CMAKE_SOURCE_DIR}; include @${CMAKE_SOURCE_DIR}/test/simulate.resc; start"
+    -e "$ELF=@$<TARGET_FILE:mytest>; $WORKING=@${CMAKE_SOURCE_DIR}; include @${CMAKE_SOURCE_DIR}/Aliou_test/simulate.resc; start"
     )
 
 

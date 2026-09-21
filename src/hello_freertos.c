@@ -15,7 +15,7 @@
 #include "pico/multicore.h"
 #include "pico/cyw43_arch.h"
 
-#include <pico_w.h>
+//#include <pico_w.h>
 
 int count = 0;
 bool on = false;
