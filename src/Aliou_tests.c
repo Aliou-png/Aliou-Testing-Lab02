@@ -6,6 +6,7 @@
 
 // test funcs
 #include "hello_freertos_test.h"
+#include "unity_config.h"
 
 
 bool LED_tast_start = false;

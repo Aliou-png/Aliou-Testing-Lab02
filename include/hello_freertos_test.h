@@ -22,7 +22,6 @@
 
 #include <unity.h>
 
-#include "unity_config.h"
 // #include "unity_config.h"
 // #include "stdint.h"
 

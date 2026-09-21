@@ -1,6 +1,7 @@
 # add_executable(mytest test.c unity_config.c)
 add_executable(mytest
   Aliou_test.c
+  # test.c
   ../src/Aliou_tests.c # back out of the directory
   unity_config.c)
 
@@ -44,16 +45,16 @@ set(RENODE_FLAGS
   --console
   )
 
-# add_test(NAME simulate_mytest COMMAND
-#     ${RENODE}
-#      ${RENODE_FLAGS}
-#     -e "$ELF=@$<TARGET_FILE:mytest>; $WORKING=@${CMAKE_SOURCE_DIR}; include @${CMAKE_SOURCE_DIR}/test/simulate.resc; start"
-#     )
 add_test(NAME simulate_mytest COMMAND
     ${RENODE}
      ${RENODE_FLAGS}
-    -e "$ELF=@$<TARGET_FILE:mytest>; $WORKING=@${CMAKE_SOURCE_DIR}; include @${CMAKE_SOURCE_DIR}/Aliou_test/simulate.resc; start"
+    -e "$ELF=@$<TARGET_FILE:mytest>; $WORKING=@${CMAKE_SOURCE_DIR}; include @${CMAKE_SOURCE_DIR}/test/simulate.resc; start"
     )
+# add_test(NAME simulate_mytest COMMAND
+#     ${RENODE}
+#      ${RENODE_FLAGS}
+#     -e "$ELF=@$<TARGET_FILE:mytest>; $WORKING=@${CMAKE_SOURCE_DIR}; include @${CMAKE_SOURCE_DIR}/Aliou_test/simulate.resc; start"
+#     )
 
 
 find_program(OPENOCD openocd)
