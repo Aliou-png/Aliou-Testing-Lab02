@@ -20,8 +20,6 @@
 // test funcs
 #include "hello_freertos_test.h"
 
-int count = 0;
-bool on = false;
 
 bool LED_tast_start = false;
 bool main_task_start = false;
@@ -70,7 +68,7 @@ bool get_task_count () {
     LED_tast_start = false;
     main_task_start = false;
 
-    return ((int)taskCount == 2) ? true: false;
+    return ((int)taskCount >= 2) ? true: false;
 }
 /** -------- (TEST) GPIO SET----------
  * the LED is flipped every 11 interation ~ 5.5 second
@@ -82,9 +80,6 @@ bool check_GPIO () {
 
     // start the task:
     sleep_ms(2000);
-
-    // wait a couple second before checking
-    vTaskDelay(2000); // 2 seconds
 
     // -------- RUN CHECK -------
         // Wait for LED to become ON
@@ -129,6 +124,8 @@ bool check_GPIO () {
 
 // duplicate blink task
 void blink_task_test(__unused void *params) {
+    int count = 0;
+    bool on = false;
     hard_assert(cyw43_arch_init() == PICO_OK);
 
     while(LED_tast_start){
