@@ -6,7 +6,6 @@
 
 // test funcs
 #include "hello_freertos_test.h"
-#include "unity_config.h"
 
 
 bool LED_tast_start = false;
@@ -29,11 +28,9 @@ void blink_task_test(__unused void *params) {
     hard_assert(cyw43_arch_init() == PICO_OK);
 
     while(LED_tast_start){
-        while (true) {
             cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
             if (count++ % 11) on = !on;
             vTaskDelay(500);
-        }
     }
     // delete task:
     vTaskDelete(NULL);
@@ -41,22 +38,18 @@ void blink_task_test(__unused void *params) {
 
 // duplicate main task
 void main_task_test(__unused void *params) {
-    char c;
-    while(main_task_start){
+
+    // create and start LED task:
+    xTaskCreate(blink_task_test, "BlinkThread",
+        BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
         // read Std In and return the opposite capitalization
-        while(c = getchar()) {
-            if (c <= 'z' && c >= 'a') putchar(c - 32);
-            else if (c >= 'A' && c <= 'Z') putchar(c + 32);
-            else putchar(c);
-        }
-    }
+        // NOTE get_char() blocks --> can assume it works
+    while(main_task_start) { vTaskDelay(500);}
     vTaskDelete(NULL); // delete task
 }
 
 void start_tasks()
 {
-    // initialize everything
-    stdio_init_all();
     const char *rtos_name;
     rtos_name = "FreeRTOS";
 
@@ -68,11 +61,6 @@ void start_tasks()
     TaskHandle_t task;
     xTaskCreate(main_task_test, "MainThread",
                 MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &task);
-    // create and start LED task:
-    xTaskCreate(blink_task_test, "BlinkThread",
-                BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
-
-    vTaskStartScheduler();
 }
 
 // test toggle: definition
@@ -101,20 +89,32 @@ char main_test (char c) {
  * */
 bool get_task_count () {
 
-    // start the task:
-    start_tasks();
+    // there should be already running 2 tasks:
+    UBaseType_t already_running_tasks = uxTaskGetNumberOfTasks();
+    if ( already_running_tasks <= 5){
+    // fail if there is already task running
+    // start the main tasks:
+    TaskHandle_t task;
 
-    // wait a couple second before checking
-    sleep_ms(2000); // 2 second
+    LED_tast_start = true;
+    main_task_start = true;
 
-    // -------- RUN CHECK -------
-    UBaseType_t taskCount = uxTaskGetNumberOfTasks();
+    UBaseType_t main_started = xTaskCreate(main_task_test, "MainThread",
+                MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &task);
+
+    // wait a couple second before checking: dont use sleep
+    vTaskDelay(2000); // 2 second
+
+        // 3. Count total active tasks
+    UBaseType_t total_tasks = uxTaskGetNumberOfTasks();
 
     // -------- STOP TASKs -------
     LED_tast_start = false;
     main_task_start = false;
 
-    return ((int)taskCount >= 2) ? true: false;
+    return (total_tasks >= 5);
+    }
+    return false;
 }
 /** -------- (TEST) GPIO SET----------
  * the LED is flipped every 11 interation ~ 5.5 second
@@ -126,16 +126,18 @@ bool check_GPIO () {
 
     // start the task:
     start_tasks();
-    sleep_ms(2000);
+    // wait a couple second before checking: dont use sleep
+
+    vTaskDelay(2000); // 2 second
 
     // -------- RUN CHECK -------
         // Wait for LED to become ON
         while (gpio_get(0) == 0)
         {
-            sleep_ms(10);
+            vTaskDelay(10);
         }
         // Wait approximately 6 seconds
-        sleep_ms(6000);
+        vTaskDelay(6000);
 
         // LED should have changed to OFF
         if (gpio_get(0) != 0)
@@ -146,7 +148,7 @@ bool check_GPIO () {
             return false;
         }
         // Wait another ~6 seconds
-        sleep_ms(6000);
+        vTaskDelay(6000);
 
         // LED should have changed back to ON
         if (gpio_get(0) == 0)
