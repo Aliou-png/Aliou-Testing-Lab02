@@ -51,8 +51,16 @@ void main_task (__unused void *params)
     UNITY_BEGIN();
     RUN_TEST(test_toggle);
     RUN_TEST(test_main);
+    RUN_TEST(test_GPIO);
     sleep_ms(5000);
     UNITY_END();
+
+    printf("Tests complete. System idling safely. Press Ctrl+A then K to exit screen.\n");
+
+    // FIX: Trap the task here so FreeRTOS never attempts to drop to a hardware sleep state
+    for (;;) {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }
 
 int main(void)
@@ -60,6 +68,12 @@ int main(void)
     // can only be used on a pico board
     stdio_init_all();
 
+    // NEW FIX: Force the Pico to pause here until you open the 'screen' command on your Mac
+    while (!stdio_usb_connected()) {
+        sleep_ms(10); // Check every 10 milliseconds
+    }
+
+    printf("terminal screen connected.");
 
     const char *rtos_name;
     rtos_name = "FreeRTOS";

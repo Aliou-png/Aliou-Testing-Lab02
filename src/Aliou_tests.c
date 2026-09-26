@@ -23,7 +23,8 @@ void blink_task_test(__unused void *params) {
 
     while(LED_tast_start){
             cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
-            if (count++ % 11) on = !on;
+            if (count++ % 11)
+            {on = !on; }
             vTaskDelay(500);
     }
     // delete task:
@@ -32,7 +33,6 @@ void blink_task_test(__unused void *params) {
 
 // duplicate main task
 void main_task_test(__unused void *params) {
-
     // create and start LED task:
     xTaskCreate(blink_task_test, "BlinkThread",
         BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
@@ -126,15 +126,16 @@ bool check_GPIO () {
 
     // -------- RUN CHECK -------
         // Wait for LED to become ON
-        while (gpio_get(0) == 0)
+        // GPIO == 0
+        while (cyw43_arch_gpio_get(CYW43_WL_GPIO_LED_PIN))
         {
-            vTaskDelay(10);
+            vTaskDelay(500);
         }
         // Wait approximately 6 seconds
         vTaskDelay(6000);
 
         // LED should have changed to OFF
-        if (gpio_get(0) != 0)
+        if (!cyw43_arch_gpio_get(CYW43_WL_GPIO_LED_PIN))
         {
             // -------- STOP TASKs -------
             LED_tast_start = false;
@@ -145,7 +146,7 @@ bool check_GPIO () {
         vTaskDelay(6000);
 
         // LED should have changed back to ON
-        if (gpio_get(0) == 0)
+        if (cyw43_arch_gpio_get(CYW43_WL_GPIO_LED_PIN))
         {
             // -------- STOP TASKs -------
             LED_tast_start = false;
