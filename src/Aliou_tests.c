@@ -7,14 +7,8 @@
 // test funcs
 #include "hello_freertos_test.h"
 
-
 bool LED_tast_start = false;
 bool main_task_start = false;
-
-#define MAIN_TASK_PRIORITY      ( tskIDLE_PRIORITY + 1UL )
-#define BLINK_TASK_PRIORITY     ( tskIDLE_PRIORITY + 2UL )
-#define MAIN_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
-#define BLINK_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
 
 // -----------------------------------------------------------------------------------------------
 /**
@@ -64,7 +58,7 @@ void start_tasks()
 }
 
 // test toggle: definition
-bool toggle (bool on, int count, bool PICO_OK) {
+bool toggle (bool on, int count, bool status) {
 
     if (!PICO_OK){ }// failed
 

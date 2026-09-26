@@ -1,6 +1,16 @@
 {
     "version": "0.2.0",
     "configurations": [
+ {
+            "name": "Debug Mac Simulator",
+            "type": "lldb",
+            "request": "launch",
+            // "program": "${command:cmake.launchTargetPath}",
+            "program": "${workspaceFolder}/build/mac_sim_app", // <--- Hardcoded local path
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "expressions": "native"
+        },
         {
             "name": "Pico Debug (Cortex-Debug)",
             "cwd": "${workspaceRoot}",
@@ -16,8 +26,6 @@
             ],
             "svdFile": "${userHome}/.pico-sdk/sdk/2.0.0/src/${command:raspberry-pi-pico.getChip}/hardware_regs/${command:raspberry-pi-pico.getChip}.svd",
             "runToEntryPoint": "main",
-            // Fix for no_flash binaries, where monitor reset halt doesn't do what is expected
-            // Also works fine for flash binaries
             "overrideLaunchCommands": [
                 "monitor reset init",
                 "load \"${command:cmake.launchTargetPath}\""
@@ -38,7 +46,6 @@
             "device": "${command:raspberry-pi-pico.getChip}",
             "svdFile": "${userHome}/.pico-sdk/sdk/2.0.0/src/${command:raspberry-pi-pico.getChip}/hardware_regs/${command:raspberry-pi-pico.getChip}.svd",
             "runToEntryPoint": "main",
-            // Give restart the same functionality as runToEntryPoint - main
             "postRestartCommands": [
                 "break main",
                 "continue"
@@ -64,29 +71,19 @@
             "preLaunchTask": "Flash",
             "svdPath": "${userHome}/.pico-sdk/sdk/2.0.0/src/${command:raspberry-pi-pico.getChip}/hardware_regs/${command:raspberry-pi-pico.getChip}.svd"
         },
-        {
-            "name": "Renode Debug (C++ Debugger)",
-            "type": "cppdbg",
-            "request": "launch",
-            "cwd": "${workspaceRoot}",
-            "program": "${command:cmake.launchTargetPath}",
-            "MIMode": "gdb",
-            "miDebuggerPath": "${command:raspberry-pi-pico.getGDBPath}",
-            "miDebuggerServerAddress": "localhost:3333",
-            "debugServerPath": "/opt/renode/bin/renode",
-            "debugServerArgs": "-e \"$ELF=@${command:cmake.launchTargetPath}; $WORKING=@${workspaceFolder}; include @${workspaceFolder}/simulate.resc\"",
-            "serverStarted": "GDB server with .* started",
-            "serverLaunchTimeout": 30000,
-            "filterStdout": true,
-            "filterStderr": true,
-            "osx": {
-                "debugServerPath": "/Applications/Renode.app/Contents/MacOS/macos_run.command"
-            },
-            "windows": {
-                "debugServerPath": "Renode.exe"
-            },
-            "preLaunchTask": "Compile Project",
-            "svdPath": "${userHome}/.pico-sdk/sdk/2.0.0/src/${command:raspberry-pi-pico.getChip}/hardware_regs/${command:raspberry-pi-pico.getChip}.svd"
-        }
+{
+    "name": "Renode Debug",
+    "type": "cortex-debug",
+    "request": "launch",
+    "cwd": "${workspaceFolder}",
+    "executable": "${workspaceFolder}/build/test/mytest.elf",
+
+    "servertype": "external",
+    "gdbTarget": "localhost:3333",
+
+    "gdbPath": "${command:raspberry-pi-pico.getGDBPath}",
+
+    "runToEntryPoint": "main"
+}
     ]
 }

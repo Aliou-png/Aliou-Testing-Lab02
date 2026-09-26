@@ -13,7 +13,8 @@
                 "PICO_BOARD=pico_w",
                 "CYW43_LWIP=1"
             ],
-            "compilerPath": "/opt/homebrew/bin/arm-none-eabi-gcc",
+            // "compilerPath": "/opt/homebrew/bin/arm-none-eabi-gcc",
+            "compilerPath": "/usr/bin/clang",
             "cStandard": "c17",
             "cppStandard": "c++14",
             "intelliSenseMode": "macos-clang-arm64"
