@@ -7,9 +7,6 @@
 // test funcs
 #include "hello_freertos_test.h"
 
-bool LED_tast_start = false;
-bool main_task_start = false;
-
 // -----------------------------------------------------------------------------------------------
 /**
  * A duplication of the RTOS system so that each test can start with a clean slate
@@ -19,13 +16,18 @@ bool main_task_start = false;
 void blink_task_test(__unused void *params) {
     int count = 0;
     bool on = false;
-    hard_assert(cyw43_arch_init() == PICO_OK);
+
+    // IMPORTANT: specialized hard that can only be called once
+    // we call inside main tes task
+        // hard_assert(cyw43_arch_init() == PICO_OK);
 
     while(LED_tast_start){
-            cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
-            if (count++ % 11)
-            {on = !on; }
-            vTaskDelay(500);
+
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
+
+        if (count++ % 11)
+        {on = !on; }
+        vTaskDelay(500);
     }
     // delete task:
     vTaskDelete(NULL);
@@ -39,6 +41,8 @@ void main_task_test(__unused void *params) {
         // read Std In and return the opposite capitalization
         // NOTE get_char() blocks --> can assume it works
     while(main_task_start) { vTaskDelay(500);}
+
+    // not calling in Unity clean up for more control
     vTaskDelete(NULL); // delete task
 }
 
@@ -60,8 +64,10 @@ void start_tasks()
 // test toggle: definition
 bool toggle (bool on, int count, bool status) {
 
-    if (!PICO_OK){ }// failed
-
+    // note PICO_OK is set to zero if there are no errors:
+    if (PICO_OK){
+        printf("tests need to be running on a Pico. \n");
+        return false; }// failed not running on Pico
     if (count++ % 11) on = !on;
     return on;
 }
@@ -69,7 +75,7 @@ bool toggle (bool on, int count, bool status) {
 // test function: definition
 char main_test (char c) {
 
-    // assuume these work: xTaskCreate, getchar, putchar
+    // assume these work: xTaskCreate, getchar, putchar
     if (c <= 'z' && c >= 'a')
         return (c - 32);
     else if (c >= 'A' && c <= 'Z')
@@ -85,7 +91,9 @@ bool get_task_count () {
 
     // there should be already running 2 tasks:
     UBaseType_t already_running_tasks = uxTaskGetNumberOfTasks();
-    if ( already_running_tasks <= 5){
+    // three is the absolut min #task that can be running
+    if ( already_running_tasks <= 3){
+    printf("Number of task running: %ld\n", already_running_tasks);
     // fail if there is already task running
     // start the main tasks:
     TaskHandle_t task;
@@ -108,6 +116,7 @@ bool get_task_count () {
 
     return (total_tasks >= 5);
     }
+    // we want a clean slate
     return false;
 }
 /** -------- (TEST) GPIO SET----------

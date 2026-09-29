@@ -28,7 +28,10 @@
 #include <stdint.h>
 // test funcs
 
-
+// so tasks can be cleaned up in task clean up and tear down
+// shared
+extern volatile bool LED_tast_start;
+extern volatile bool main_task_start;
 
 //#include "unity_config.h"
 // #include "stdint.h"

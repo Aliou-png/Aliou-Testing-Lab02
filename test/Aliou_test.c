@@ -1,3 +1,9 @@
+
+#define configUSE_TRACE_FACILITY                  1
+#define configUSE_STATS_FORMATTING_FUNCTIONS      1
+#define configSTATS_BUFFER_MAX_LENGTH             400
+
+
 // test funcs
 #include "hello_freertos_test.h"
 #include "unity_config.h"
@@ -5,11 +11,30 @@
 // for mac os sleep:
 #include <unistd.h>
 
-// not being used
-void setUp(void) {}
+volatile bool LED_tast_start = false;
+volatile bool main_task_start = false;
 
 // not being used
-void tearDown(void) {}
+void setUp(void) {
+
+    // make sure the task are not running on the other core
+    LED_tast_start = false;
+    main_task_start = false;
+
+    // IMPORTANT: need a hardware sleep
+    sleep_ms(600);
+}
+
+// not being used
+void tearDown(void) {
+    // SAME thing make sure tasks terminate
+    // make sure the task are not running on the other core
+    LED_tast_start = false;
+    main_task_start = false;
+
+    // IMPORTANT: need a hardware sleep
+    sleep_ms(600);
+}
 
 void test_GPIO(void)
 {
@@ -19,7 +44,7 @@ void test_GPIO(void)
 void test_task_count(void)
 {
     bool task_created = get_task_count();
-    TEST_ASSERT_TRUE_MESSAGE(task_created, "GPIO on/off: Failed.");
+    TEST_ASSERT_TRUE_MESSAGE(task_created, "Number of Tasked Created: Failed.");
 }
 void test_main(void)
 {
@@ -46,13 +71,19 @@ void test_toggle(void)
 
 void main_task (__unused void *params)
 {
-    sleep_ms(5000); // Give time for TTY to attach.
+    sleep_ms(5000); // Give time for TTY to attach
     printf("Start tests\n");
+    // call this once
+    hard_assert(cyw43_arch_init() == PICO_OK);
+
     UNITY_BEGIN();
     RUN_TEST(test_toggle);
     RUN_TEST(test_main);
     RUN_TEST(test_GPIO);
+    RUN_TEST(test_task_count);
     sleep_ms(5000);
+    // safly kill
+    cyw43_arch_deinit();
     UNITY_END();
 
     printf("Tests complete. System idling safely. Press Ctrl+A then K to exit screen.\n");
